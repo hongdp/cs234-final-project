@@ -8,15 +8,46 @@ class ClinicalValueFunc():
         Use vocabulary to dyanmically generate weights to avoid mismatching when
         vocabulary and feature being regenerated.
 
-        Expected input features are: [Race: Enum(5), Age: Enum(11), Height: Float(1),
-        Weight: Float(1), Amiodarone: Enum(4), Carbamazepine: Enum(4), Phenytoin: Enum(4), Rifampin or Rifampicin: Enum(4)]
+        Expected input features are: [Race: Enum(4), Age: Enum(10), Height: Float(1),
+        Weight: Float(1), Amiodarone: Enum(3), Carbamazepine: Enum(3), Phenytoin: Enum(3), Rifampin or Rifampicin: Enum(3)]
 
         Params:
             vocab: enum vocabulary of form:
                 {feature: {val0: 0, val1: 1, ...}, ...}
         '''
         self.bias = 4.0376
-        self.weights = np.zeros([34], dtype=np.float32)
+        race_weights = np.zeros([4], dtype=np.float32)
+        race_weights[vocab['Race']['Asian']] = -0.6752
+        race_weights[vocab['Race']['Black or African American']] = 0.4060
+        race_weights[vocab['Race']['Unknown']] = 0.0443
+
+        age_weights = np.zeros([10], dtype=np.float32)
+        age_weights[vocab['Age']['10 - 19']] = -0.2546 * 1
+        age_weights[vocab['Age']['20 - 29']] = -0.2546 * 2
+        age_weights[vocab['Age']['30 - 39']] = -0.2546 * 3
+        age_weights[vocab['Age']['40 - 49']] = -0.2546 * 4
+        age_weights[vocab['Age']['50 - 59']] = -0.2546 * 5
+        age_weights[vocab['Age']['60 - 69']] = -0.2546 * 6
+        age_weights[vocab['Age']['70 - 79']] = -0.2546 * 7
+        age_weights[vocab['Age']['80 - 89']] = -0.2546 * 8
+        age_weights[vocab['Age']['90+']] = -0.2546 * 9
+        age_weights[vocab['Age']['NA']] = -0.2546 * 5
+
+        height_weights = np.asarray([0.0118], dtype=np.float32)
+        weight_weights = np.asarray([0.0134], dtype=np.float32)
+
+        amiodarone_weights = np.zeros([3], dtype=np.float32)
+        amiodarone_weights[vocab['Amiodarone (Cordarone)']['1']] = -0.5695
+
+        carbamazepine_weights = np.zeros([3], dtype=np.float32)
+        carbamazepine_weights[vocab['Carbamazepine (Tegretol)']['1']] = 1.2799
+
+        phenytoin_weights = np.zeros([3], dtype=np.float32)
+        phenytoin_weights[vocab['Phenytoin (Dilantin)']['1']] = 1.2799
+
+        rifampin_weights = np.zeros([3], dtype=np.float32)
+        rifampin_weights[vocab['Rifampin or Rifampicin']['1']] = 1.2799
+
 
 
     def eval(self, feature):
