@@ -1,6 +1,7 @@
 from enum import Enum
 import config
 import numpy as np
+from csv import reader
 
 class FeatureTypes(Enum):
     UNKNOWN = 0 # Feature will be ignored.
@@ -16,10 +17,10 @@ def BuildEnumVocab(config, output=False):
     vocab file format: feature, val0, val1, val2\n
     '''
 
-    with open(config.data_filename , 'r') as data_file:
+    with open(config.data_filename , mode='r', newline='') as data_file:
         # Build feature types list.
-        header_line = next(data_file)
-        cols = header_line.split(',')
+        csv_reader = reader(data_file)
+        cols = next(csv_reader)
         vocab = {}
         feature_types = []
         for col in cols:
@@ -35,12 +36,16 @@ def BuildEnumVocab(config, output=False):
 
 
         # Build value store.
-        for patient_row in data_file:
-            for value, feature, feature_type in zip(patient_row.split(','), header_line.split(','), feature_types):
+        for patient_row in csv_reader:
+            for value, feature, feature_type in zip(patient_row, cols, feature_types):
+                # Replace '' with 'NA'.
+                if value == '':
+                    value = 'NA'
                 if feature_type == FeatureTypes.ENUM and value not in vocab[feature]:
                     vocab[feature].add(value)
-    with open(config.vocab_filename , 'w') as vocab_file:
-        for feature, values in vocab.iteritems():
+
+    with open(config.vocab_filename , mode='w') as vocab_file:
+        for feature, values in vocab.items():
             line = [feature]
             for value in values:
                 line.append(value)
@@ -61,11 +66,10 @@ class WarfarinDataSet():
         '''
         self.next = 0
 
-        with open(config.data_filename, 'r') as data_file:
+        with open(config.data_filename, mode='r', newline='') as data_file:
             # Build feature types list.
-            header_line = next(data_file)
-            self.cols = header_line.split(',')
-            print(self.cols)
+            csv_reader = reader(data_file)
+            self.cols = next(csv_reader)
             feature_types = []
             for col in self.cols:
                 if col in config.enum_feature_cols:
@@ -74,7 +78,6 @@ class WarfarinDataSet():
                     feature_types.append(FeatureTypes.FLOAT)
                 elif col == config.label_col:
                     feature_types.append(FeatureTypes.LABEL)
-                    print("label found")
                 else:
                     feature_types.append(FeatureTypes.UNKNOWN)
 
@@ -88,18 +91,19 @@ class WarfarinDataSet():
                     self.vocab[tokens[0]] = {}
                     for ind, value in enumerate(tokens[1:]):
                         self.vocab[tokens[0]][value] = ind
-            print(self.vocab)
 
 
             # Build value store.
             self.examples = []
             nolabelcnt = 0
 
-            for patient_row in data_file:
+            for patient_row in csv_reader:
                 features = np.array([])
                 label_found = True
-                for value, feature_type, feature in zip(patient_row.split(','), feature_types, self.cols):
-                    # print("value: {} feature: {} type: {}".format(value, feature, feature_type))
+                for value, feature_type, feature in zip(patient_row, feature_types, self.cols):
+                    # Replace '' with 'NA'.
+                    if value == '':
+                        value = 'NA'
                     if feature_type == FeatureTypes.ENUM:
                         enum_map = self.vocab[feature]
                         feature = np.zeros([len(enum_map)], dtype=np.float32)
@@ -110,34 +114,30 @@ class WarfarinDataSet():
                             value = float(value)
                         except ValueError:
                             value = .0
-                            # print("cant convert to float: {}".format(value))
                         feature = np.asarray([value], dtype=np.float32)
                         features = np.concatenate((features, feature))
                     elif feature_type == FeatureTypes.LABEL:
                         try:
                             label = float(value)
                         except ValueError:
-                            # print("no label: {} cnt: {}".format(value, nolabelcnt))
                             nolabelcnt += 1
                             label_found = False
 
                 if label_found:
                     self.examples.append({'features': features, 'label': label})
 
-            print(self.examples)
-
     def __iter__(self):
         return self
 
-    def next():
+    def __next__(self):
         '''
         Return raw feature and label of next patient in the form of:
             {'features': np.array(np.float32), 'label':np.float32}
         '''
         self.next += 1
-        if self.next > len(self.values):
+        if self.next > len(self.examples):
             raise StopIteration
-        return self.values[self.next-1]
+        return self.examples[self.next-1]
 
 
 if __name__ == '__main__':
