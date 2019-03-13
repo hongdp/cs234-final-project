@@ -1,8 +1,9 @@
 import numpy as np
+from .agent import Agent
 
-class ClinicalValueFunc():
+class ClinicalDosingAgent(Agent):
 
-    def __init__(self, vocab):
+    def __init__(self, config, vocab):
         '''
         Initialize Value function of Clinical dosing algorithm.
         Use vocabulary to dyanmically generate weights to avoid mismatching when
@@ -16,7 +17,7 @@ class ClinicalValueFunc():
                 {feature: {val0: 0, val1: 1, ...}, ...}
         '''
         self.bias = 4.0376
-        race_weights = np.zeros([4], dtype=np.float32)
+        race_weights = np.zeros([5], dtype=np.float32)
         race_weights[vocab['Race']['Asian']] = -0.6752
         race_weights[vocab['Race']['Black or African American']] = 0.4060
         race_weights[vocab['Race']['Unknown']] = 0.0443
@@ -48,8 +49,12 @@ class ClinicalValueFunc():
         rifampin_weights = np.zeros([3], dtype=np.float32)
         rifampin_weights[vocab['Rifampin or Rifampicin']['1']] = 1.2799
 
+        self.weights = np.concatenate((race_weights, age_weights, height_weights, weight_weights, amiodarone_weights, carbamazepine_weights, phenytoin_weights, rifampin_weights))
 
 
-    def eval(self, feature):
+
+    def act(self, feature):
         return (np.matmul(feature, self.weights) + self.bias) ** 2
 
+    def feedback(self, feature, reward):
+        pass

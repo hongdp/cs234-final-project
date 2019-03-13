@@ -1,6 +1,8 @@
-from enum import Enum
-import config
+import random
 import numpy as np
+import config
+
+from enum import Enum
 from csv import reader
 
 class FeatureTypes(Enum):
@@ -89,7 +91,7 @@ class WarfarinDataSet():
                 for line in vocab_file:
                     tokens = line.split(',')
                     self.vocab[tokens[0]] = {}
-                    for ind, value in enumerate(tokens[1:]):
+                    for ind, value in enumerate(tokens[1:-1]):
                         self.vocab[tokens[0]][value] = ind
 
 
@@ -100,12 +102,12 @@ class WarfarinDataSet():
             for patient_row in csv_reader:
                 features = np.array([])
                 label_found = True
-                for value, feature_type, feature in zip(patient_row, feature_types, self.cols):
+                for value, feature_type, col in zip(patient_row, feature_types, self.cols):
                     # Replace '' with 'NA'.
                     if value == '':
                         value = 'NA'
                     if feature_type == FeatureTypes.ENUM:
-                        enum_map = self.vocab[feature]
+                        enum_map = self.vocab[col]
                         feature = np.zeros([len(enum_map)], dtype=np.float32)
                         feature[enum_map[value]] = 1.0
                         features = np.concatenate((features, feature))
@@ -126,20 +128,16 @@ class WarfarinDataSet():
                 if label_found:
                     self.examples.append({'features': features, 'label': label})
 
-    def __iter__(self):
-        return self
+    def shuffle(self):
+        random.shuffle(self.examples)
 
-    def __next__(self):
-        '''
-        Return raw feature and label of next patient in the form of:
-            {'features': np.array(np.float32), 'label':np.float32}
-        '''
-        self.next += 1
-        if self.next > len(self.examples):
-            raise StopIteration
-        return self.examples[self.next-1]
+    def size(self):
+        return len(self.examples)
+
+    def __iter__(self):
+        return iter(self.examples)
 
 
 if __name__ == '__main__':
-    BuildEnumVocab(config.DataSetConfig(), True)
-    BuildEnumVocab(config.ClinicalDataSetConfig(), True)
+    BuildEnumVocab(config.ConstConfig(), True)
+    BuildEnumVocab(config.ClinicalDosingConfig(), True)
