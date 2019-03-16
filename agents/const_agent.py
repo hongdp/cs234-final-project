@@ -1,5 +1,5 @@
 import numpy as np
-from .agent import Agent
+from .agent import Agent, Actions
 
 class ConstAgent(Agent):
 
@@ -7,7 +7,7 @@ class ConstAgent(Agent):
         pass
 
     def act(self, feature):
-        return 35.0
+        return Actions.MEDIUM
 
     def feedback(self, feature, reward):
         pass

@@ -1,5 +1,5 @@
 import numpy as np
-from .agent import Agent
+from .agent import Agent, Actions
 
 class ClinicalDosingAgent(Agent):
 
@@ -54,7 +54,13 @@ class ClinicalDosingAgent(Agent):
 
 
     def act(self, feature):
-        return (np.matmul(feature, self.weights) + self.bias) ** 2
+        dose = (np.matmul(feature, self.weights) + self.bias) ** 2
+        if dose < 21:
+            return Actions.LOW
+        elif dose < 49:
+            return Actions.MEDIUM
+        else:
+            return Actions.HIGH
 
     def feedback(self, feature, reward):
         pass
