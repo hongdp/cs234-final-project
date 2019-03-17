@@ -71,9 +71,9 @@ class WarfarinDataSet():
         with open(config.data_filename, mode='r', newline='') as data_file:
             # Build feature types list.
             csv_reader = reader(data_file)
-            self.cols = next(csv_reader)
+            cols = next(csv_reader)
             feature_types = []
-            for col in self.cols:
+            for col in cols:
                 if col in config.enum_feature_cols:
                     feature_types.append(FeatureTypes.ENUM)
                 elif col in config.float_feature_cols:
@@ -101,7 +101,7 @@ class WarfarinDataSet():
             for patient_row in csv_reader:
                 features = np.array([])
                 skip = False
-                for value, feature_type, col in zip(patient_row, feature_types, self.cols):
+                for value, feature_type, col in zip(patient_row, feature_types, cols):
                     # Replace '' with 'NA'.
                     if value == '':
                         value = 'NA'
