@@ -23,15 +23,17 @@ class LinUCBAgent(Agent):
         action = np.argmax(p)
 
         if action == 0:
-            return Actions.LOW
+            return Actions.LOW, {'feature': feature, 'action': action}
         elif action == 1:
-            return Actions.MEDIUM
+            return Actions.MEDIUM, {'feature': feature, 'action': action}
         else:
-            return Actions.HIGH
-        #pass
+            return Actions.HIGH, {'feature': feature, 'action': action}
+        #pass, 'action': action
 
-    def feedback(self, feature, reward, action):
+    def feedback(self, reward, context):
         # print(reward, action.value)
-        self.A[action.value] += np.dot(feature, feature)
-        self.b[action.value] += reward * feature
+        feature = context['feature']
+        ind = context['action']
+        self.A[ind] += np.dot(feature, feature)
+        self.b[ind] += reward * feature
         #pass
