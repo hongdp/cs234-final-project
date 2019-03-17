@@ -97,15 +97,17 @@ class WarfarinDataSet():
 
             # Build value store.
             self.examples = []
-            nolabelcnt = 0
 
             for patient_row in csv_reader:
                 features = np.array([])
-                label_found = True
+                skip = False
                 for value, feature_type, col in zip(patient_row, feature_types, self.cols):
                     # Replace '' with 'NA'.
                     if value == '':
                         value = 'NA'
+                    if col in config.required_features and value == 'NA':
+                        skip = True
+                        continue
                     if feature_type == FeatureTypes.ENUM:
                         enum_map = self.vocab[col]
                         feature = np.zeros([len(enum_map)], dtype=np.float32)
@@ -122,10 +124,9 @@ class WarfarinDataSet():
                         try:
                             label = float(value)
                         except ValueError:
-                            nolabelcnt += 1
-                            label_found = False
+                            skip = True
 
-                if label_found:
+                if not skip:
                     self.examples.append({'features': features, 'label': label})
 
     def shuffle(self):

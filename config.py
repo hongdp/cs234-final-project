@@ -14,6 +14,7 @@ class ClinicalDosingConfig():
         self.enum_feature_cols = {'Age', 'Race', 'Amiodarone (Cordarone)', 'Carbamazepine (Tegretol)', 'Phenytoin (Dilantin)', 'Rifampin or Rifampicin'}
         self.float_feature_cols = {'Weight (kg)', 'Height (cm)'}
         self.label_col = 'Therapeutic Dose of Warfarin'
+        self.required_features  = {'Age', 'Height (cm)', 'Weight (kg)'}
         self.agent_name = 'clinical_dosing'
 
 

@@ -42,7 +42,8 @@ def main():
             agent.feedback(features, reward)
             regrets[ts] += regret
             avg_regrets[ts] += regret/(ts+1)
-        print('{} final regret: {}'.format(i, regret))
+        precision = 1 - (regret / dataset.size())
+        print('{} final regret: {} final average precision: {}'.format(i, regret, precision))
 
     regrets = [x/args.shuffle_times for x in regrets]
     avg_regrets = [x/args.shuffle_times for x in avg_regrets]
