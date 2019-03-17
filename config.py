@@ -17,6 +17,21 @@ class ClinicalDosingConfig():
         self.required_features  = {'Age', 'Height (cm)', 'Weight (kg)'}
         self.agent_name = 'clinical_dosing'
 
+class LassoConfig():
+    def __init__(self):
+        self.data_filename = 'data/warfarin.csv'
+        self.vocab_filename= 'data/warfarin_lasso_vocab.txt'
+        self.enum_feature_cols = {'Gender','Age', 'Race', 'Amiodarone (Cordarone)', 'Carbamazepine (Tegretol)', 'Phenytoin (Dilantin)', 'Rifampin or Rifampicin'}
+        self.float_feature_cols = {'Weight (kg)', 'Height (cm)','Indication for Warfarin Treatment'}
+        self.label_col = 'Therapeutic Dose of Warfarin'
+        self.required_features  = {'Age', 'Height (cm)', 'Weight (kg)'}
+        self.agent_name = 'lasso'
+        self.lasso_q = 1
+        self.lasso_h = 5
+        self.lasso_lam1 = 5e-2
+        self.lasso_lam2 = 5e-2
+        self.feature_len = 33
+
 class LinUCBConfig():
     def __init__(self):
         self.data_filename = 'data/warfarin.csv'
@@ -27,10 +42,10 @@ class LinUCBConfig():
         self.required_features  = {'Age', 'Height (cm)', 'Weight (kg)'}
         self.agent_name = 'LinUCB'
 
+
 def get_config(agent_name):
-    if agent_name == 'const':
-        return ConstConfig()
-    elif agent_name == 'clinical_dosing':
-        return ClinicalDosingConfig()
-    elif agent_name == 'LinUCB':
-        return LinUCBConfig()
+    configs = [ConstConfig(),ClinicalDosingConfig(),LassoConfig()]
+    for config in configs:
+        if config.agent_name == agent_name:
+            return config
+

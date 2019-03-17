@@ -2,6 +2,7 @@ from __future__ import print_function, division
 
 import argparse
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from config import get_config
 from agents import get_agent, Actions
 from dataset import WarfarinDataSet
@@ -26,14 +27,14 @@ def main():
     args = parser.parse_args()
     config = get_config(args.agent_name)
     dataset = WarfarinDataSet(config)
-    agent = get_agent(args.agent_name, config, dataset)
     regrets = [0] * dataset.size()
-    avg_regrets = [0] * dataset.size()
+    avg_precision = [0] * dataset.size()
 
     for i in range(args.shuffle_times):
+        agent = get_agent(args.agent_name, config, dataset)
         dataset.shuffle()
         regret = 0
-        for ts, data in enumerate(dataset):
+        for ts, data in tqdm(enumerate(dataset)):
             features = data['features']
             label = data['label']
             action, context = agent.act(features)
@@ -41,12 +42,11 @@ def main():
             regret -= reward
             agent.feedback(reward, context)
             regrets[ts] += regret
-            avg_regrets[ts] += regret/(ts+1)
-        precision = 1 - (regret / dataset.size())
-        print('{} final regret: {} final average precision: {}'.format(i, regret, precision))
+            avg_precision[ts] += 1 - regret/(ts+1)
+        print('{} final regret: {} final average precision: {}'.format(i, regret, 1 - regret/dataset.size()))
 
     regrets = [x/args.shuffle_times for x in regrets]
-    avg_regrets = [x/args.shuffle_times for x in avg_regrets]
+    avg_precision = [x/args.shuffle_times for x in avg_precision]
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(range(dataset.size()), regrets, 'b')
@@ -54,7 +54,7 @@ def main():
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
-    ax2.plot(range(dataset.size()), avg_regrets, 'b')
+    ax2.plot(range(dataset.size()), avg_precision, 'b')
     fig2.savefig("data/scores/{}-avg.png".format(args.agent_name))
 
 
