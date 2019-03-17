@@ -7,7 +7,10 @@ class ConstAgent(Agent):
         pass
 
     def act(self, feature):
-        return Actions.MEDIUM
+        '''
+        return: action, context
+        '''
+        return Actions.MEDIUM, None
 
-    def feedback(self, feature, reward):
+    def feedback(self, reward, context):
         pass

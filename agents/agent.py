@@ -13,3 +13,6 @@ class Agent():
     def act(self, feature):
         raise NotImplementedError
 
+    def feedback(self, reward, context):
+        raise NotImplementedError
+
