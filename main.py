@@ -39,7 +39,7 @@ def main():
             action = agent.act(features)
             reward = calculate_reward(label, action)
             regret -= reward
-            agent.feedback(features, reward)
+            agent.feedback(features, reward, action)
             regrets[ts] += regret
             avg_regrets[ts] += regret/(ts+1)
         precision = 1 - (regret / dataset.size())
