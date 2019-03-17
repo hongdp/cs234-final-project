@@ -3,7 +3,7 @@ from .agent import Agent, Actions
 
 class ClinicalDosingAgent(Agent):
 
-    def __init__(self, config, vocab):
+    def __init__(self, config, dataset):
         '''
         Initialize Value function of Clinical dosing algorithm.
         Use vocabulary to dyanmically generate weights to avoid mismatching when
@@ -17,6 +17,7 @@ class ClinicalDosingAgent(Agent):
                 {feature: {val0: 0, val1: 1, ...}, ...}
         '''
         self.bias = 4.0376
+        vocab = dataset.vocab
         race_weights = np.zeros([5], dtype=np.float32)
         race_weights[vocab['Race']['Asian']] = -0.6752
         race_weights[vocab['Race']['Black or African American']] = 0.4060

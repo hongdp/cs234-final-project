@@ -3,8 +3,9 @@ from .agent import Agent, Actions
 
 
 class LinUCBAgent(Agent):
-    def __init__(self, config, vocab):
-        self.vocab = vocab
+    def __init__(self, config, dataset):
+        self.dim = len(dataset.examples[0]['features'])
+        print(self.dim)
         # self.history = []
         # self.total = 0
         self.A = np.stack([np.identity(29) for _ in range(3)], axis=0)

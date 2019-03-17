@@ -26,7 +26,7 @@ def main():
     args = parser.parse_args()
     config = get_config(args.agent_name)
     dataset = WarfarinDataSet(config)
-    agent = get_agent(args.agent_name, config, dataset.vocab)
+    agent = get_agent(args.agent_name, config, dataset)
     regrets = [0] * dataset.size()
     avg_regrets = [0] * dataset.size()
 
