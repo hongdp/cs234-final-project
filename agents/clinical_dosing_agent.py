@@ -55,11 +55,11 @@ class ClinicalDosingAgent(Agent):
     def act(self, feature):
         dose = (np.matmul(feature, self.weights) + self.bias) ** 2
         if dose < 21:
-            return Actions.LOW
+            return Actions.LOW, None
         elif dose < 49:
-            return Actions.MEDIUM
+            return Actions.MEDIUM, None
         else:
-            return Actions.HIGH
+            return Actions.HIGH, None
 
-    def feedback(self, feature, reward, action):
+    def feedback(self, reward, context):
         pass

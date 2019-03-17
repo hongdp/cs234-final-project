@@ -36,10 +36,10 @@ def main():
         for ts, data in enumerate(dataset):
             features = data['features']
             label = data['label']
-            action = agent.act(features)
+            action, context = agent.act(features)
             reward = calculate_reward(label, action)
             regret -= reward
-            agent.feedback(features, reward, action)
+            agent.feedback(reward, context)
             regrets[ts] += regret
             avg_regrets[ts] += regret/(ts+1)
         precision = 1 - (regret / dataset.size())
