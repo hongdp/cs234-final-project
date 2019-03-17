@@ -142,3 +142,4 @@ class WarfarinDataSet():
 if __name__ == '__main__':
     BuildEnumVocab(config.ConstConfig(), True)
     BuildEnumVocab(config.ClinicalDosingConfig(), True)
+    BuildEnumVocab(config.LassoConfig(), True)
