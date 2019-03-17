@@ -13,8 +13,8 @@ class LinUCBAgent(Agent):
         # self.total = 0
         self.A = np.stack([np.identity(self.dim) for _ in range(3)], axis=0)
         self.b = np.zeros((3,self.dim))
-        sigma = 0.4
-        self.alpha = 1+ np.sqrt(np.log(2*3*self.tdim/sigma)/2)
+        sigma = 0.25
+        self.alpha = 1+ np.sqrt(np.log(2/sigma)/2)
         print(self.alpha)
         #pass
 

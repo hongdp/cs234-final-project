@@ -36,7 +36,7 @@ class LinUCBConfig():
     def __init__(self):
         self.data_filename = 'data/warfarin.csv'
         self.vocab_filename= 'data/warfarin_linucb_vocab.txt'
-        self.enum_feature_cols = {'Age', 'Race', 'Amiodarone (Cordarone)', 'Carbamazepine (Tegretol)', 'Phenytoin (Dilantin)', 'Rifampin or Rifampicin', 'Was Dose of Acetaminophen or Paracetamol (Tylenol) >1300mg/day'}
+        self.enum_feature_cols = {'Age', 'Race', 'Amiodarone (Cordarone)', 'Carbamazepine (Tegretol)', 'Phenytoin (Dilantin)', 'Rifampin or Rifampicin'}
         self.float_feature_cols = {'Weight (kg)', 'Height (cm)'}
         self.label_col = 'Therapeutic Dose of Warfarin'
         self.required_features  = {'Age', 'Height (cm)', 'Weight (kg)'}
@@ -44,7 +44,7 @@ class LinUCBConfig():
 
 
 def get_config(agent_name):
-    configs = [ConstConfig(),ClinicalDosingConfig(),LassoConfig()]
+    configs = [ConstConfig(),ClinicalDosingConfig(),LassoConfig(),LinUCBConfig()]
     for config in configs:
         if config.agent_name == agent_name:
             return config
