@@ -1,6 +1,7 @@
 from .clinical_dosing_agent import ClinicalDosingAgent
 from .const_agent import ConstAgent
 from .lasso_agent import LassoAgent
+from .LinUCB_agent import LinUCBAgent
 from .agent import Actions
 
 def get_agent(agent_name, config, vocab):
@@ -10,3 +11,5 @@ def get_agent(agent_name, config, vocab):
         return ClinicalDosingAgent(config, vocab)
     elif agent_name  == 'lasso':
         return LassoAgent(config, vocab)
+    elif agent_name == 'LinUCB':
+        return LinUCBAgent(config, vocab)

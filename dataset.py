@@ -125,7 +125,6 @@ class WarfarinDataSet():
                             label = float(value)
                         except ValueError:
                             skip = True
-
                 if not skip:
                     self.examples.append({'features': features, 'label': label})
 
@@ -142,4 +141,8 @@ class WarfarinDataSet():
 if __name__ == '__main__':
     BuildEnumVocab(config.ConstConfig(), True)
     BuildEnumVocab(config.ClinicalDosingConfig(), True)
+<<<<<<< HEAD
     BuildEnumVocab(config.LassoConfig(), True)
+=======
+    BuildEnumVocab(config.LinUCBConfig(), True)
+>>>>>>> a3dcbf096d9ad816694a3c5a162bf2cfcae309b4

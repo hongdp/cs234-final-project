@@ -31,7 +31,7 @@ def main():
     avg_precision = [0] * dataset.size()
 
     for i in range(args.shuffle_times):
-        agent = get_agent(args.agent_name, config, dataset.vocab)
+        agent = get_agent(args.agent_name, config, dataset)
         dataset.shuffle()
         regret = 0
         for ts, data in tqdm(enumerate(dataset)):

@@ -3,7 +3,7 @@ from .agent import Agent, Actions
 
 class ConstAgent(Agent):
 
-    def __init__(self, config, vocab):
+    def __init__(self, config, dataset):
         pass
 
     def act(self, feature):
