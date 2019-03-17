@@ -63,5 +63,5 @@ class ClinicalDosingAgent(Agent):
         else:
             return Actions.HIGH
 
-    def feedback(self, feature, reward):
+    def feedback(self, feature, reward, action):
         pass

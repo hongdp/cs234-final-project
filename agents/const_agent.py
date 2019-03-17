@@ -9,5 +9,5 @@ class ConstAgent(Agent):
     def act(self, feature):
         return Actions.MEDIUM
 
-    def feedback(self, feature, reward):
+    def feedback(self, feature, reward, action):
         pass
