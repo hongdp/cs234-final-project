@@ -105,7 +105,7 @@ class WarfarinDataSet():
                     # Replace '' with 'NA'.
                     if value == '':
                         value = 'NA'
-                    if col in config.required_features and value == 'NA':
+                    if hasattr(config, 'required_features') and col in config.required_features and value == 'NA':
                         skip = True
                         continue
                     if feature_type == FeatureTypes.ENUM:
