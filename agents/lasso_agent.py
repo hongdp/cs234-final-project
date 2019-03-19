@@ -11,7 +11,7 @@ def is_j(j, i, q):
 
 class LassoAgent(Agent):
 
-    def __init__(self, config, vocab):
+    def __init__(self, config, dataset):
         self.actions = [Actions.LOW, Actions.MEDIUM, Actions.HIGH]
         self.q = config.lasso_q
         self.h = config.lasso_h
@@ -19,7 +19,7 @@ class LassoAgent(Agent):
         self.lam2_0 = config.lasso_lam2
         self.lam2 = config.lasso_lam2
         self.t = 0
-        self.feature_len = config.feature_len
+        self.feature_len = len(dataset.examples[0]['features'])
         self.T_x = [np.array([], dtype=np.float32).reshape((0, self.feature_len))]*3
         self.T_y = [np.array([], dtype=np.float32).reshape((0))]*3
         self.S_x = [np.array([], dtype=np.float32).reshape((0, self.feature_len))]*3
