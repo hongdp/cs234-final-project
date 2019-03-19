@@ -7,13 +7,51 @@ from config import get_config
 from agents import get_agent, Actions
 from dataset import WarfarinDataSet
 
-def calculate_reward(label, action):
+def calculate_class_distance_reward(label, action):
+    if label < 21:
+        if action == Actions.LOW:
+            return 0
+        elif action == Actions.MEDIUM:
+            return -1
+        elif action == Actions.HIGH:
+            return -2
+    elif label < 49:
+        if action == Actions.LOW:
+            return -1
+        elif action == Actions.MEDIUM:
+            return 0
+        elif action == Actions.HIGH:
+            return -1
+    else:
+        if action == Actions.LOW:
+            return -2
+        elif action == Actions.MEDIUM:
+            return -1
+        elif action == Actions.HIGH:
+            return 0
+
+def calculate_default_reward(label, action):
     if label < 21:
         return 0 if action == Actions.LOW else -1
     elif label < 49:
         return 0 if action == Actions.MEDIUM else -1
     else:
         return 0 if action == Actions.HIGH else -1
+
+def get_reward_func(name='default'):
+    if name == 'default':
+        return calculate_default_reward
+    elif name == 'class_distance':
+        return calculate_class_distance_reward
+
+
+def is_correct_action(label, action):
+    if label < 21:
+        return True if action == Actions.LOW else False
+    elif label < 49:
+        return True if action == Actions.MEDIUM else False
+    else:
+        return True if action == Actions.HIGH else False
 
 
 def main():
@@ -22,6 +60,10 @@ def main():
                         help='Name of agent to be used to retieve config and agent object.')
     parser.add_argument('--shuffle_times', '-s', dest='shuffle_times', type=int, action='store', required=True,
                         help='Times to shuffle the dataset.')
+    parser.add_argument('--reward_func', '-r', dest='reward_func', default='default', action='store',
+                        help='Reward function.')
+    parser.add_argument('--output_name', '-o', dest='output_name', default='', action='store',
+                        help='prefix of output score files.')
 
 
     args = parser.parse_args()
@@ -29,33 +71,45 @@ def main():
     dataset = WarfarinDataSet(config)
     regrets = [0] * dataset.size()
     avg_precision = [0] * dataset.size()
+    reward_func = get_reward_func(args.reward_func)
 
     for i in range(args.shuffle_times):
         agent = get_agent(args.agent_name, config, dataset)
         dataset.shuffle()
         regret = 0
+        corrects = 0
         for ts, data in tqdm(enumerate(dataset)):
             features = data['features']
             label = data['label']
             action, context = agent.act(features)
-            reward = calculate_reward(label, action)
-            regret -= reward
+            reward = reward_func(label, action)
             agent.feedback(reward, context)
-            regrets[ts] += regret
-            avg_precision[ts] += 1 - regret/(ts+1)
-        print('{} final regret: {} final average precision: {}'.format(i, regret, 1 - regret/dataset.size()))
 
+            # Calacualte Eval metrics
+            regret -= reward
+            regrets[ts] += regret
+
+            if is_correct_action(label, action):
+                corrects += 1
+            avg_precision[ts] += corrects/(ts+1)
+        print('{} final regret: {} final average precision: {}'.format(i, regret, corrects/(dataset.size())))
+
+
+    if args.output_name:
+        output_name = args.output_name
+    else:
+        output_name = args.agent_name
     regrets = [x/args.shuffle_times for x in regrets]
     avg_precision = [x/args.shuffle_times for x in avg_precision]
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(range(dataset.size()), regrets, 'b')
-    fig.savefig("data/scores/{}-regret.png".format(args.agent_name))
+    fig.savefig("data/scores/{}-regret.png".format(output_name))
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
     ax2.plot(range(dataset.size()), avg_precision, 'b')
-    fig2.savefig("data/scores/{}-avg.png".format(args.agent_name))
+    fig2.savefig("data/scores/{}-avg.png".format(output_name))
 
 
 

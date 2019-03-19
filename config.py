@@ -48,4 +48,5 @@ def get_config(agent_name):
     for config in configs:
         if config.agent_name == agent_name:
             return config
+    raise ValueError('No config found.')
 
