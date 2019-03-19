@@ -105,11 +105,17 @@ def main():
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(range(dataset.size()), regrets, 'b')
     fig.savefig("data/scores/{}-regret.png".format(output_name))
+    with open("data/scores/{}-regret-values.txt".format(output_name), mode='w') as f:
+        f.write(','.join(map(str, regrets)))
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
     ax2.plot(range(dataset.size()), avg_precision, 'b')
-    fig2.savefig("data/scores/{}-avg.png".format(output_name))
+    fig2.savefig("data/scores/{}-precision.png".format(output_name))
+    with open("data/scores/{}-precision-values.txt".format(output_name), mode='w') as f:
+        f.write(','.join(map(str, avg_precision)))
+
+
 
 
 
