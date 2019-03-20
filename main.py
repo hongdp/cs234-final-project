@@ -70,8 +70,8 @@ def main():
     args = parser.parse_args()
     config = get_config(args.agent_name)
     dataset = WarfarinDataSet(config)
-    regrets = [[0] * dataset.size()]*args.shuffle_times
-    precision = [[0] * dataset.size()]*args.shuffle_times
+    regrets = np.zeros((args.shuffle_times, dataset.size()))
+    precision  = np.zeros((args.shuffle_times, dataset.size()))
     reward_func = get_reward_func(args.reward_func)
 
     for i in range(args.shuffle_times):
@@ -95,7 +95,6 @@ def main():
             precision[i][ts] = corrects/(ts+1)
         print('{} final regret: {} final average precision: {}'.format(i, regret, precision[i][-1]))
 
-
     if args.output_name:
         output_name = args.output_name
     else:
@@ -106,15 +105,16 @@ def main():
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(range(dataset.size()), avg_regrets, 'b')
     fig.savefig("data/scores/{}-regret.png".format(output_name))
+    print(np.std(regrets, axis=0))
     with open("data/scores/{}-regret-values.txt".format(output_name), mode='w') as f:
-        f.write(';'.join(map(lambda x: '.'.join(map(str, x)), regrets)))
+        f.write(';'.join(map(lambda x: ','.join(map(str, x)), regrets)))
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
     ax2.plot(range(dataset.size()), avg_precision, 'b')
     fig2.savefig("data/scores/{}-precision.png".format(output_name))
     with open("data/scores/{}-precision-values.txt".format(output_name), mode='w') as f:
-        f.write(';'.join(map(lambda x: '.'.join(map(str, x)), precision)))
+        f.write(';'.join(map(lambda x: ','.join(map(str, x)), precision)))
 
 
 
