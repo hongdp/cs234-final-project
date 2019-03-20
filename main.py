@@ -2,6 +2,7 @@ from __future__ import print_function, division
 
 import argparse
 import matplotlib.pyplot as plt
+import numpy as np
 from tqdm import tqdm
 from config import get_config
 from agents import get_agent, Actions
@@ -69,8 +70,8 @@ def main():
     args = parser.parse_args()
     config = get_config(args.agent_name)
     dataset = WarfarinDataSet(config)
-    regrets = [0] * dataset.size()
-    avg_precision = [0] * dataset.size()
+    regrets = [[0] * dataset.size()]*args.shuffle_times
+    precision = [[0] * dataset.size()]*args.shuffle_times
     reward_func = get_reward_func(args.reward_func)
 
     for i in range(args.shuffle_times):
@@ -87,33 +88,33 @@ def main():
 
             # Calacualte Eval metrics
             regret -= reward
-            regrets[ts] += regret
+            regrets[i][ts] = regret
 
             if is_correct_action(label, action):
                 corrects += 1
-            avg_precision[ts] += corrects/(ts+1)
-        print('{} final regret: {} final average precision: {}'.format(i, regret, corrects/(dataset.size())))
+            precision[i][ts] = corrects/(ts+1)
+        print('{} final regret: {} final average precision: {}'.format(i, regret, precision[i][-1]))
 
 
     if args.output_name:
         output_name = args.output_name
     else:
         output_name = args.agent_name
-    regrets = [x/args.shuffle_times for x in regrets]
-    avg_precision = [x/args.shuffle_times for x in avg_precision]
+    avg_regrets = np.average(regrets, axis=0)
+    avg_precision = np.average(precision, axis=0)
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
-    ax.plot(range(dataset.size()), regrets, 'b')
+    ax.plot(range(dataset.size()), avg_regrets, 'b')
     fig.savefig("data/scores/{}-regret.png".format(output_name))
     with open("data/scores/{}-regret-values.txt".format(output_name), mode='w') as f:
-        f.write(','.join(map(str, regrets)))
+        f.write(';'.join(map(lambda x: '.'.join(map(str, x)), regrets)))
 
     fig2 = plt.figure()
     ax2 = fig2.add_subplot(1, 1, 1)
     ax2.plot(range(dataset.size()), avg_precision, 'b')
     fig2.savefig("data/scores/{}-precision.png".format(output_name))
     with open("data/scores/{}-precision-values.txt".format(output_name), mode='w') as f:
-        f.write(','.join(map(str, avg_precision)))
+        f.write(';'.join(map(lambda x: '.'.join(map(str, x)), precision)))
 
 
 
